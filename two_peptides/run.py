@@ -4,6 +4,7 @@ __all__ = ["run"]
 
 
 import os
+from itertools import product
 import numpy as np
 import click
 from bgmol.systems.minipeptides import AMINO_ACIDS
@@ -12,6 +13,11 @@ from .report import Report
 
 
 DEFAULT_DISTANCES = np.arange(3.0, 0.3, -0.1)
+VALID_PEPTIDES = (
+    list(AMINO_ACIDS.keys())
+    +
+    ["".join(x) for x in product(list(AMINO_ACIDS.keys()), list(AMINO_ACIDS.keys()))]
+)
 
 
 def run(
@@ -65,8 +71,8 @@ def run(
 
 
 @click.command()
-@click.option("-a", "--aminoacids1", type=click.Choice(list(AMINO_ACIDS.keys())))
-@click.option("-b", "--aminoacids2", type=click.Choice(list(AMINO_ACIDS.keys())))
+@click.option("-a", "--aminoacids1", type=click.Choice(VALID_PEPTIDES))
+@click.option("-b", "--aminoacids2", type=click.Choice(VALID_PEPTIDES))
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True, writable=True), default="./data")
 @click.option("-d", "--distances", type=float, multiple=True, default=DEFAULT_DISTANCES.tolist())
 @click.option("--test/--no-test", default=False)
