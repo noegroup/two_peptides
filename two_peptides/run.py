@@ -5,6 +5,7 @@ __all__ = ["run"]
 
 import os
 from itertools import product
+from typing import Sequence
 import numpy as np
 import click
 from bgmol.systems.minipeptides import AMINO_ACIDS
@@ -24,7 +25,7 @@ def run(
         aminoacids1: str,
         aminoacids2: str,
         outdir: str = "./data",
-        distances: float = DEFAULT_DISTANCES,
+        distances: Sequence[float] = DEFAULT_DISTANCES,
         test: bool = False
 ):
     def filename(suffix, is_test=test, npz=False):
@@ -48,7 +49,7 @@ def run(
         simulation.friction = 100.
         simulation.step(1 if test else 125000)
         simulation.friction = 0.1
-        simulation.step(1 if test else 125000)
+        simulation.step(1 if test else 25000)
 
     reports = []
 
@@ -56,10 +57,10 @@ def run(
         # equilibrate
         simulation.d0 = distance
         simulation.friction = 100.
-        simulation.step(1 if test else 125000)
+        simulation.step(1 if test else 25000)
         simulation.friction = 0.1
         simulation.step(1 if test else 25000)
-        for i in range(10 if test else 5000):
+        for i in range(10 if test else 1000):
             simulation.step(1 if test else 500)
             reports.append(simulation.report())
 
