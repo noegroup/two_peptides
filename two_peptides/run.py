@@ -67,7 +67,7 @@ def run(
 @click.command()
 @click.option("-a", "--aminoacids1", type=click.Choice(list(AMINO_ACIDS.keys())))
 @click.option("-b", "--aminoacids1", type=click.Choice(list(AMINO_ACIDS.keys())))
-@click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True, writable=True), default="../data")
+@click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True, writable=True), default="./data")
 @click.option("-d", "--distances", type=float, multiple=True, default=DEFAULT_DISTANCES.tolist())
 @click.option("--test/--no-test", default=False)
 def main(
