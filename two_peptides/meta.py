@@ -1,6 +1,9 @@
-__all__ = ["embedding"]
+__all__ = ["embedding", "fast_folder_pairs"]
 
+
+from copy import deepcopy
 import mdtraj.core.topology
+from bgmol.systems import FastFolder, FAST_FOLDER_NAMES
 
 
 embedding_map = {
@@ -31,6 +34,30 @@ embedding_map = {
 }
 
 
+one_letter = {
+    'ALA': 'A',
+    'CYS': 'C',
+    'ASP': 'D',
+    'GLU': 'E',
+    'PHE': 'F',
+    'GLY': 'G',
+    'HIS': 'H',
+    'ILE': 'I',
+    'LYS': 'K',
+    'LEU': 'L',
+    'MET': 'M',
+    'ASN': 'N',
+    'PRO': 'P',
+    'GLN': 'Q',
+    'ARG': 'R',
+    'SER': 'S',
+    'THR': 'T',
+    'VAL': 'V',
+    'TRP': 'W',
+    'TYR': 'Y',
+}
+
+
 def embedding(atom: mdtraj.core.topology.Atom):
     if atom.name == "CB" and atom.residue.name in embedding_map:
         return embedding_map[atom.residue.name]
@@ -38,3 +65,27 @@ def embedding(atom: mdtraj.core.topology.Atom):
         return embedding_map[atom.name]
     else:
         raise ValueError(f"No embedding for atom {atom} in residue {atom.residue}")
+
+
+def fast_folder_pairs():
+    lookup = deepcopy(one_letter)
+    lookup["HSE"] = "H"
+    lookup["HSD"] = "H"
+    lookup["NLE"] = "L"
+    pairs_of_pairs = set()
+    for fast_folder in FAST_FOLDER_NAMES:
+        model = FastFolder(fast_folder, solvated=False)
+        top = model.mdtraj_topology
+        pairs = set()
+        for i in range(top.n_residues - 1):
+            res1 = top.residue(i).name
+            res2 = top.residue(i+1).name
+            assert res1 in lookup
+            assert res2 in lookup
+            pairs.add((lookup[res1] + lookup[res2]))
+        for i, pair1 in enumerate(pairs):
+            for j, pair2 in enumerate(pairs):
+                if j >= i:
+                    continue
+                pairs_of_pairs.add((pair1, pair2))
+    return pairs_of_pairs
