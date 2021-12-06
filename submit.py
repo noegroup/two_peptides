@@ -1,8 +1,8 @@
 
 
-from two_peptides.meta import fast_folder_pairs
-from bgmol.systems.minipeptides import AMINO_ACIDS
 import os
+import time
+from two_peptides.status import submitted, is_finished
 
 
 TEST = False
@@ -16,6 +16,7 @@ submit_stub = lambda a,b: (
     f"two_peptides -a {a} -b {b} "
 )
 
+
 def submit(a,b):
     command = submit_stub(a, b)
     if TEST:
@@ -25,12 +26,8 @@ def submit(a,b):
     else:
         os.system(command)
 
-for a in AMINO_ACIDS:
-    for b in AMINO_ACIDS:
-        submit(a,b)
 
-for a, b in fast_folder_pairs():
-    submit(a,b)
-
-
-
+for a, b in submitted():
+    if not is_finished(a, b):
+        submit(a, b)
+        time.sleep(0.1)
