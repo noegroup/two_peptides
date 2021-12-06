@@ -1,4 +1,6 @@
-__all__ = ["embedding", "fast_folder_pairs"]
+
+
+__all__ = ["embedding", "fast_folder_pairs", "DEFAULT_DISTANCES"]
 
 
 from copy import deepcopy

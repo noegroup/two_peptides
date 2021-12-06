@@ -4,6 +4,8 @@ __all__ = ["TwoPeptidesDataset", "potential_of_mean_force", "score", "force_erro
 
 
 import os
+from typing import Union, List, Tuple
+
 import numpy as np
 from dataclasses import dataclass
 from .meta import DEFAULT_DISTANCES
@@ -25,7 +27,7 @@ class PMF:
     bin_centers: np.ndarray  # bins in Angstrom
 
 
-def potential_of_mean_force(peptide1, peptide2, rootdir):
+def potential_of_mean_force(peptide1: str, peptide2: str, rootdir: str) -> PMF:
     """Potential of mean force along the reaction coordinate
     (the distance between peptide1-beads and peptide2-beads center of mass).
 
