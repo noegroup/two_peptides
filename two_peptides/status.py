@@ -32,7 +32,7 @@ def is_finished(a, b, outdir="./data"):
         return False
     if not os.path.exists(filename("energies", npz=True)):
         return False
-    return False
+    return True
 
 
 @click.command()
