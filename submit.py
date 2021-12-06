@@ -26,14 +26,12 @@ def submit(a,b):
         os.system(command)
 
 
-submit("A", "A")
-if False:
-    for a in AMINO_ACIDS:
-        for b in AMINO_ACIDS:
-            submit(a,b)
-    
-    for a, b in fast_folder_pairs():
+for a in AMINO_ACIDS:
+    for b in AMINO_ACIDS:
         submit(a,b)
+
+for a, b in fast_folder_pairs():
+    submit(a,b)
 
 
 
