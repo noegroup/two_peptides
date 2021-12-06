@@ -12,7 +12,7 @@ submit_stub = lambda a,b: (
     f"sbatch "
     f"-J sim_{a}_{b} -o log/sim_{a}_{b}.log "
     f"--time 24:00:00 -p gpu --gres gpu:1 --mem 6GB "
-    f"--nodelist gpu[000-070] "
+    f"--exclude gpu[100-130] "
     f"two_peptides -a {a} -b {b} "
 )
 
@@ -24,7 +24,6 @@ def submit(a,b):
         print(command)
     else:
         os.system(command)
-
 
 for a in AMINO_ACIDS:
     for b in AMINO_ACIDS:
