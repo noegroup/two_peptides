@@ -2,8 +2,10 @@ __all__ = ["embedding", "fast_folder_pairs"]
 
 
 from copy import deepcopy
-import mdtraj.core.topology
-from bgmol.systems import FastFolder, FAST_FOLDER_NAMES
+import numpy as np
+
+
+DEFAULT_DISTANCES = np.arange(3.0, 0.3, -0.1)
 
 
 embedding_map = {
@@ -58,7 +60,7 @@ one_letter = {
 }
 
 
-def embedding(atom: mdtraj.core.topology.Atom):
+def embedding(atom: "mdtraj.core.topology.Atom") -> int:
     if atom.name == "CB" and atom.residue.name in embedding_map:
         return embedding_map[atom.residue.name]
     elif atom.name in ["N", "CA", "C", "O"]:
@@ -68,6 +70,7 @@ def embedding(atom: mdtraj.core.topology.Atom):
 
 
 def fast_folder_pairs():
+    from bgmol.systems import FastFolder, FAST_FOLDER_NAMES
     lookup = deepcopy(one_letter)
     lookup["HSE"] = "H"
     lookup["HSD"] = "H"

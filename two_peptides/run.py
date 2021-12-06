@@ -11,9 +11,9 @@ import click
 from bgmol.systems.minipeptides import AMINO_ACIDS
 from .simulation import TwoPeptideSimulation, barostat
 from .report import Report
+from .meta import DEFAULT_DISTANCES
 
 
-DEFAULT_DISTANCES = np.arange(3.0, 0.3, -0.1)
 VALID_PEPTIDES = (
     list(AMINO_ACIDS.keys())
     +
