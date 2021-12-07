@@ -4,6 +4,7 @@ __all__ = ["submitted", "status"]
 
 import os
 import click
+from subprocess import Popen, PIPE
 
 from bgmol.systems.minipeptides import AMINO_ACIDS
 from two_peptides.meta import fast_folder_pairs
@@ -36,19 +37,42 @@ def is_finished(a, b, outdir="./data"):
     return True
 
 
+def parse_squeue():
+    p = Popen(["squeue", "-u", "kraemea88", '-o', '"%.15j %.8T"'], stdout=PIPE, stderr=PIPE)
+    p.communicate()
+    assert p.returncode == 0
+    status_dict = {}
+    for line in iter(p.stdout.readline, ''):
+        jobname, status = line.strip().split()
+        if not jobname.startswith("sim_"):
+            continue
+        _, *peptides = jobname.strip().split("_")
+        joblist = status_dict.get(status, [])
+        status_dict[status] = joblist + [peptides]
+    return status_dict
+
+
+def _determine_status(peptide1, peptide2, outdir, squeue_dict):
+    if is_finished(peptide1, peptide2, outdir):
+        return "C"
+    elif (peptide1, peptide2) in squeue_dict["RUNNING"]:
+        return "R"
+    elif (peptide1, peptide2) in squeue_dict["PENDING"]:
+        return "Q"
+    else:
+        return "E"
+
+
 @click.command()
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True), default="./data")
 def main(outdir):
-    n_finished = 0
-    n_unfinished = 0
+    n_jobs = {"C": 0, "R": 0, "E": 0, "Q": 0}
+    squeue_dict = parse_squeue()
     for a, b in submitted():
         print("ok" if is_finished(a, b, outdir) else "--", a, b)
-        if is_finished(a, b, outdir):
-            n_finished += 1
-        else:
-            n_unfinished += 1
+        n_jobs[_determine_status(a, b, outdir, squeue_dict)] += 1
     print(f"""--------------------------------------
-{n_finished} finished, {n_unfinished} remaining
+{n_jobs['C']} finished, {n_jobs['E']} failed, {n_jobs['R']} running, {n_jobs['Q']} pending 
 """)
 
 
