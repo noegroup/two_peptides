@@ -3,6 +3,8 @@
 __all__ = ["embedding", "fast_folder_pairs", "DEFAULT_DISTANCES"]
 
 
+import os
+import pickle
 from copy import deepcopy
 import contextlib
 import io
@@ -74,6 +76,10 @@ def embedding(atom: "mdtraj.core.topology.Atom") -> int:
 
 
 def fast_folder_pairs():
+    cachename = os.path.join(os.path.dirname(__file__), "_ffpairs.pic") 
+    if os.path.isfile(cachename):
+        with open(cachename, "rb") as f:
+            return pickle.load(f)
     from bgmol.systems import FastFolder, FAST_FOLDER_NAMES
     lookup = deepcopy(one_letter)
     lookup["HSE"] = "H"
@@ -92,9 +98,12 @@ def fast_folder_pairs():
             assert res1 in lookup
             assert res2 in lookup
             pairs.add((lookup[res1] + lookup[res2]))
+        pairs = list(pairs)
         for i, pair1 in enumerate(pairs):
             for j, pair2 in enumerate(pairs):
                 if j >= i:
                     continue
                 pairs_of_pairs.add((pair1, pair2))
+    with open(cachename, "wb") as f:
+        pickle.dump(pairs_of_pairs, f)
     return pairs_of_pairs

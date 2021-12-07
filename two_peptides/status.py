@@ -74,6 +74,8 @@ def main(outdir, detailed):
     squeue_dict = parse_squeue()
     for a, b in submitted():
         status = _determine_status(a, b, outdir, squeue_dict)
+        if status == "E":
+            status = _determine_status(b, a, outdir, squeue_dict)
         if detailed:
             print(status, a, b)
         n_jobs[status] += 1
