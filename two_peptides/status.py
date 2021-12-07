@@ -39,16 +39,19 @@ def is_finished(a, b, outdir="./data"):
 
 def parse_squeue():
     p = Popen(["squeue", "-u", "kraemea88", '-o', '"%.15j %.8T"'], stdout=PIPE, stderr=PIPE)
-    p.communicate()
-    assert p.returncode == 0
-    status_dict = {}
-    for line in iter(p.stdout.readline, ''):
-        jobname, status = line.strip().split()
+    lines = [line.decode('utf-8').strip() for line in p.stdout.readlines()]
+    status_dict = {"RUNNING": [], "PENDING": []}
+    for line in lines:
+        try:
+            _, jobname, status = line.strip().split()
+        except ValueError:
+            continue
         if not jobname.startswith("sim_"):
             continue
         _, *peptides = jobname.strip().split("_")
-        joblist = status_dict.get(status, [])
-        status_dict[status] = joblist + [peptides]
+        status = status[:-1]
+        if status in status_dict:
+            status_dict[status].append(tuple(peptides))
     return status_dict
 
 
@@ -65,13 +68,16 @@ def _determine_status(peptide1, peptide2, outdir, squeue_dict):
 
 @click.command()
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True), default="./data")
-def main(outdir):
+@click.option("--detailed/--no-detailed", default=False)
+def main(outdir, detailed):
     n_jobs = {"C": 0, "R": 0, "E": 0, "Q": 0}
     squeue_dict = parse_squeue()
     for a, b in submitted():
-        print("ok" if is_finished(a, b, outdir) else "--", a, b)
-        n_jobs[_determine_status(a, b, outdir, squeue_dict)] += 1
-    print(f"""--------------------------------------
+        status = _determine_status(a, b, outdir, squeue_dict)
+        if detailed:
+            print(status, a, b)
+        n_jobs[status] += 1
+    print(f"""----------------------------------------------------------------------------
 {n_jobs['C']} finished, {n_jobs['E']} failed, {n_jobs['R']} running, {n_jobs['Q']} pending 
 """)
 

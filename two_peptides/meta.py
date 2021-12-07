@@ -4,6 +4,8 @@ __all__ = ["embedding", "fast_folder_pairs", "DEFAULT_DISTANCES"]
 
 
 from copy import deepcopy
+import contextlib
+import io
 import numpy as np
 
 
@@ -79,7 +81,9 @@ def fast_folder_pairs():
     lookup["NLE"] = "L"
     pairs_of_pairs = set()
     for fast_folder in FAST_FOLDER_NAMES:
-        model = FastFolder(fast_folder, solvated=False)
+        with contextlib.redirect_stdout(io.StringIO()):
+            with contextlib.redirect_stderr(io.StringIO()):
+                model = FastFolder(fast_folder, solvated=False)
         top = model.mdtraj_topology
         pairs = set()
         for i in range(top.n_residues - 1):
