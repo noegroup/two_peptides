@@ -1,6 +1,6 @@
 
 
-from torch.utils.data import DataLoader
+from torch_geometric.data import DataLoader
 from two_peptides.run import run
 from two_peptides.meta import DEFAULT_DISTANCES
 from two_peptides.dataset import TwoPeptidesDataset
@@ -28,6 +28,5 @@ def test_run_and_read(tmpdir):
     assert len(trainset + valset) == len(DEFAULT_DISTANCES) * 10 * 3
     trainloader = DataLoader(trainset, shuffle=True, batch_size=256)
     for batch in trainloader:
-        # make sure unit conversion has occurred
-        print(batch.pos)
+        # make sure unit conversion has been applied
         assert batch.pos.std() > 3.0

@@ -8,7 +8,7 @@ of the "beads" in peptide 1 and 2.
 
 
 ## Units
-The positions in data files are in units of nanometers.
+The coordinates in data files are in units of nanometers.
 The forces are unbiased forces in units of kJ/mol/nm.
 Units are converted to Angstrom and kcal/mol/A when loading the
 `TwoPeptidesDataset`.
@@ -25,7 +25,7 @@ dataset = TwoPeptidesDataset(
 )
 ```
 All energies are in kcal/mol.
-All coorddinates are in Angstrom.
+All coordinates are in Angstrom.
 Embedding follows Nick's convention.
 
 To split the dataset into training and validation in a determinstic manner,
@@ -44,6 +44,13 @@ dataset = TwoPeptidesDataset(...)
 total_dataset = dataset + other_dataset
 ```
 
+The dataset can be used within a `torch_geometric.DataLoader`:
+```python
+from torch_geometric.data import DataLoader
+loader = DataLoader(dataset, shuffle=True, batch_size=256)
+for batch in loader:
+    ...
+```
 ## Other Types of Analysis
 To analyse the potential of mean force, check
 ```python
