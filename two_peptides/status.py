@@ -38,8 +38,17 @@ def is_finished(a, b, outdir="./data"):
 @click.command()
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True), default="./data")
 def main(outdir):
+    n_finished = 0
+    n_unfinished = 0
     for a, b in submitted():
         print("ok" if is_finished(a, b, outdir) else "--", a, b)
+        if is_finished(a, b, outdir):
+            n_finished += 1
+        else:
+            n_unfinished += 1
+    print(f"""--------------------------------------
+{n_finished} finished, {n_unfinished} remaining
+""")
 
 
 if __name__ == "__main__":
