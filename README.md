@@ -12,7 +12,7 @@ of the "beads" in peptide 1 and 2.
 To load all available data:
 
 ```python
-from two_peptides import TwoPeptidesDataset
+from two_peptides.dataset import TwoPeptidesDataset
 dataset = TwoPeptidesDataset(
     coordglob="<DATADIR>/*_coord.npy",
     forceglob="<DATADIR>/*_force.npy",
