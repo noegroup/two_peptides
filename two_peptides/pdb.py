@@ -2,14 +2,15 @@
 
 import os
 import click
-from bgmol.systems import TwoMiniPeptides
 import mdtraj as md
-from .status import submitted
+from two_peptides.status import submitted
+from two_peptides.simulation import TwoPeptideSimulation
 
 
 def save_pdb(aminoacids1, aminoacids2, outdir):
-    system = TwoMiniPeptides(aminoacids1, aminoacids2)
-    traj = md.Trajectory(system.positions, topology=system.mdtraj_topology)
+    sim = TwoPeptideSimulation(aminoacids1, aminoacids2)
+    model = sim.model
+    traj = md.Trajectory(model.positions[sim.beads], topology=model.mdtraj_topology.subset(sim.beads))
     traj.save_pdb(os.path.join(outdir, f"{aminoacids1}_{aminoacids2}.pdb"))
 
 
