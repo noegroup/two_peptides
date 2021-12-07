@@ -10,5 +10,9 @@ setup(
         'console_scripts': [
             'two_peptides=two_peptides.run:main',
         ],
+    },
+    package_data={
+        # And include any *.msg files found in the "hello" package, too:
+        "two_peptides": ["*.pic"],
     }
 )
