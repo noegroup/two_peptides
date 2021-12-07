@@ -7,7 +7,9 @@ import os
 from itertools import product
 from typing import Sequence
 import numpy as np
+
 import click
+
 from bgmol.systems.minipeptides import AMINO_ACIDS
 from .simulation import TwoPeptideSimulation, barostat
 from .report import Report

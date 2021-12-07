@@ -24,3 +24,14 @@ All energies are in kcal/mol.
 All coorddinates are in Angstrom.
 Embedding follows Nick's convention.
 
+## Requirements
+### Mandatory:
+- numpy
+
+### Optional:
+- `torchmd_net` (for loading datasets)
+- `pymbar` (for computing PMFs)
+- `openmm` (for running simulations)
+- `click` (for using the command-line interface)
+- `bgmol` (branch `two_peptides`; for simulations and analysis)
+- `mdtraj` (for simulations and analysis)

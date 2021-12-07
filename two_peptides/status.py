@@ -4,8 +4,9 @@ __all__ = ["submitted", "status"]
 
 import os
 import click
-from two_peptides.meta import fast_folder_pairs
+
 from bgmol.systems.minipeptides import AMINO_ACIDS
+from two_peptides.meta import fast_folder_pairs
 
 
 def submitted():

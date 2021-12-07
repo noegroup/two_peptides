@@ -35,6 +35,7 @@ def potential_of_mean_force(peptide1: str, peptide2: str, rootdir: str) -> PMF:
     -------
 
     Plot the PMF between Ala and Tyr2 from the energies file in the current dir:
+    >>> from two_peptides.dataset import potential_of_mean_force
     >>> pmf = potential_of_mean_force("A", "YY", rootdir="./")
     >>> plt.plot(pmf.bin_centers, pmf.free_energy)
     >>> plt.fill_between(
@@ -45,6 +46,10 @@ def potential_of_mean_force(peptide1: str, peptide2: str, rootdir: str) -> PMF:
     >>> )
     >>> plt.ylabel("Free Energy $F$ [kcal/mol]")
     >>> plt.xlabel("Distance $d0$ [A]")
+
+    Notes
+    -----
+    Requires pymbar.
     """
     from pymbar import MBAR
     z = np.load(os.path.join(rootdir, f"{peptide1}_{peptide2}_energies.npz"))

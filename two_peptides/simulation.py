@@ -2,9 +2,9 @@
 __all__ = ["TwoPeptideSimulation", "barostat"]
 
 
-import numpy as np
 import warnings
 import contextlib
+import numpy as np
 
 from bgmol.systems import TwoMiniPeptides
 from bgmol.util.importing import import_openmm
