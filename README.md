@@ -6,6 +6,7 @@ covering distances from 4 A to 30 A.
 The distances are measured between the centers-of-mass
 of the "beads" in peptide 1 and 2.
 
+Data is located in `/import/a12/users/kraemea88/two_peptides`.
 
 ## Units
 The coordinates in data files are in units of nanometers.
