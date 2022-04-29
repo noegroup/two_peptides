@@ -57,6 +57,9 @@ To analyse the potential of mean force, check
 from two_peptides.dataset import potential_of_mean_force
 help(potential_of_mean_force)
 ```
+**Caveat**: The potential of mean force is not accurate.
+It does not include the volume transformation term of the reaction coordinate.
+Note that this term is quite intricate when using rectangular boxes and distances > half the box length.
 
 
 
