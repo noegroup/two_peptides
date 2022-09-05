@@ -122,9 +122,11 @@ def copy_system(source: mm.System):
     return mm.XmlSerializer.deserializeSystem(mm.XmlSerializer.serializeSystem(source))
 
 
-CGBEADS = (
-    "not water "
-    "and resname != ACE "
-    "and resname != NME "
-    "and (backbone or name CB) "
-)
+#CGBEADS = (
+#    "not water "
+#    "and resname != ACE "
+#    "and resname != NME "
+#    "and (backbone or name CB) "
+#)
+
+CGBEADS = "protein "

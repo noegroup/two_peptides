@@ -33,7 +33,7 @@ class TwoPeptidesDataset(InMemoryDataset):
         trainset.coord_list = self.coord_list[:n_train]
         valset.coord_list = self.coord_list[n_train:]
         trainset.force_list = self.force_list[:n_train]
-        valset.force_list = self.force_list[n_train]
+        valset.force_list = self.force_list[n_train:]
         trainset.embedding_list = self.embedding_list[:n_train]
         valset.embedding_list = self.embedding_list[n_train:]
         trainset.index = _make_index(trainset.coord_list)
@@ -45,7 +45,7 @@ class TwoPeptidesDataset(InMemoryDataset):
         assert isinstance(other, InMemoryDataset)
         dataset = InMemoryDataset("", "", "")
         dataset.coord_list = self.coord_list + other.coord_list
-        dataset.force_list = self.coord_list + other.force_list
+        dataset.force_list = self.force_list + other.force_list
         dataset.embedding_list = self.embedding_list + other.embedding_list
         dataset.index = _make_index(dataset.coord_list)
         return dataset

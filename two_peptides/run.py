@@ -44,14 +44,14 @@ def run(
 
     simulation = TwoPeptideSimulation(aminoacids1, aminoacids2)
     simulation.d0 = distances[0]
-    simulation.k = 500.
+    simulation.k = 1. if test else 500.
 
     with barostat(simulation.simulation):
         simulation.minimize()
         simulation.friction = 100.
-        simulation.step(1 if test else 125000)
+        simulation.step(0 if test else 125000)
         simulation.friction = 0.1
-        simulation.step(1 if test else 25000)
+        simulation.step(0 if test else 25000)
 
     reports = []
 
@@ -83,7 +83,7 @@ def main(
         aminoacids1: str,
         aminoacids2: str,
         outdir: str = "./data",
-        distances: float = DEFAULT_DISTANCES,
+        distances: Sequence[float] = DEFAULT_DISTANCES,
         test: bool = False
 ):
     return run(aminoacids1, aminoacids2, outdir, distances, test)

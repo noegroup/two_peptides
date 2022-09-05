@@ -81,21 +81,27 @@ def _get_state(context: mm.Context, **kwargs) -> mm.State:
 
 
 def _force(state: mm.State):
-    return state.getForces(asNumpy=True).value_in_unit(unit.kilojoule_per_mole/unit.nanometer)
+    forces = state.getForces(asNumpy=True).value_in_unit(unit.kilojoule_per_mole/unit.nanometer)
+    assert not np.isnan(forces).any()
+    return forces
 
 
 def _positions(state: mm.State, topology: md.Topology, center_group: np.ndarray):
     xyz = state.getPositions(asNumpy=True).value_in_unit(unit.nanometer)
-    box = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(unit.nanometer)
-    lengths_angles = md.utils.box_vectors_to_lengths_and_angles(*box)
-    traj = md.Trajectory(
-        xyz=xyz[None, ...],
-        unitcell_lengths=lengths_angles[:3],
-        unitcell_angles=lengths_angles[3:],
-        topology=topology
-    )
-    traj.image_molecules(anchor_molecules=[{topology.atom(i) for i in center_group}])
-    return traj.xyz[0, ...]
+    assert not np.isnan(xyz).any()
+    return xyz
+
+    #box = state.getPeriodicBoxVectors(asNumpy=True).value_in_unit(unit.nanometer)
+    #lengths_angles = md.utils.box_vectors_to_lengths_and_angles(*box)
+    #traj = md.Trajectory(
+    #    xyz=xyz[None, ...],
+    #    unitcell_lengths=lengths_angles[:3],
+    #    unitcell_angles=lengths_angles[3:],
+    #    topology=topology
+    #)
+    #traj.image_molecules(anchor_molecules=[{topology.atom(i) for i in center_group}])
+    #assert not np.isnan(traj.xyz[0, ...]).any()
+    #return traj.xyz[0, ...]
 
 
 def _energy(state: mm.State):
@@ -110,4 +116,4 @@ def _centroid_distance(state: mm.State):
 
 
 def _assert_equal(x, y):
-    assert np.allclose(x, y, atol=1e-3)
+    assert np.allclose(x, y, atol=5e-3)

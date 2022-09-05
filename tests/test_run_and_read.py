@@ -15,9 +15,9 @@ def test_run_and_read(tmpdir):
         forceglob=str(tmpdir/"test_*_force.npy"),
         embedglob=str(tmpdir/"test_*_embed.npy"),
     )
-    assert dataset[0].pos.shape == (10, 3)
-    assert dataset[0].y.shape == (10, 3)
-    assert dataset[0].z.shape == (10, )
+    assert dataset[0].pos.shape == (44, 3)
+    assert dataset[0].y.shape == (44, 3)
+    assert dataset[0].z.shape == (44, )
     assert len(dataset) == len(DEFAULT_DISTANCES) * 10 * 3
 
     # test split

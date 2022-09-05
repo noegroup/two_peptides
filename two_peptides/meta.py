@@ -72,7 +72,8 @@ def embedding(atom: "mdtraj.core.topology.Atom") -> int:
     elif atom.name in ["N", "CA", "C", "O"]:
         return embedding_map[atom.name]
     else:
-        raise ValueError(f"No embedding for atom {atom} in residue {atom.residue}")
+        return 0
+        #raise ValueError(f"No embedding for atom {atom} in residue {atom.residue}")
 
 
 def fast_folder_pairs():

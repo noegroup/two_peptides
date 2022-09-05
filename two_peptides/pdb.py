@@ -17,7 +17,7 @@ def save_pdb(aminoacids1, aminoacids2, outdir, selection="beads"):
 
 @click.command()
 @click.option("-o", "--outdir", type=click.Path(exists=True, writable=True, dir_okay=True), default="./data")
-@click.option("-s", "--selection", type=click.Choice(["beads", "protein"]), default="beads")
+@click.option("-s", "--selection", type=click.Choice(["beads", "protein"]), default="protein")
 def main(outdir, selection):
     for peptide1, peptide2 in submitted():
         print(peptide1, peptide2)
