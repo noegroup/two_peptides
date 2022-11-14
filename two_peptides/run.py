@@ -87,4 +87,8 @@ def run_cmd(
         distances: Sequence[float] = DEFAULT_DISTANCES,
         test: bool = False
 ):
+    """Run simulation of peptide dimer.
+    Example: `two_peptides run -a AA -b YY` will run umbrella sampling between dialanine and dityrosine
+    and save the results to a subdirectory data.
+    """
     return run(aminoacids1, aminoacids2, outdir, distances, test)

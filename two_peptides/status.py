@@ -8,6 +8,7 @@ from subprocess import Popen, PIPE
 
 from bgmol.systems.minipeptides import AMINO_ACIDS
 from two_peptides.meta import fast_folder_pairs
+from two_peptides.cli import cli_main
 
 
 def submitted():
@@ -66,10 +67,11 @@ def _determine_status(peptide1, peptide2, outdir, squeue_dict):
         return "E"
 
 
-@click.command()
+@cli_main.command(name="status")
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True), default="./data")
 @click.option("--detailed/--no-detailed", default=False)
-def main(outdir, detailed):
+def status_cmd(outdir, detailed):
+    """Return the status of the simulations."""
     n_jobs = {"C": 0, "R": 0, "E": 0, "Q": 0}
     squeue_dict = parse_squeue()
     for a, b in submitted():
@@ -82,7 +84,3 @@ def main(outdir, detailed):
     print(f"""----------------------------------------------------------------------------
 {n_jobs['C']} finished, {n_jobs['E']} failed, {n_jobs['R']} running, {n_jobs['Q']} pending 
 """)
-
-
-if __name__ == "__main__":
-    main()
