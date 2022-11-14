@@ -45,6 +45,7 @@ def run(
     simulation.d0 = distances[0]
     simulation.k = 1. if test else 500.
 
+    print("Equilibrating")
     with barostat(simulation.simulation):
         simulation.minimize()
         simulation.friction = 100.
@@ -55,12 +56,15 @@ def run(
     reports = []
 
     for distance in distances:
+        print(f"d: {distance:.2f}")
         # equilibrate
         simulation.d0 = distance
         simulation.friction = 100.
         simulation.step(1 if test else 25000)
         simulation.friction = 0.1
-        simulation.step(1 if test else 25000)
+        for _ in range(5):
+            simulation.step(1 if test else 5000)
+            print(simulation.equilibration_stats)
         for i in range(10 if test else 1000):
             simulation.step(1 if test else 500)
             reports.append(simulation.report())

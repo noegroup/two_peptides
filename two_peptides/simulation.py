@@ -5,6 +5,7 @@ __all__ = ["TwoPeptideSimulation", "barostat"]
 import warnings
 import contextlib
 import numpy as np
+import openmm
 
 from bgmol.systems import TwoMiniPeptides
 from bgmol.util.importing import import_openmm
@@ -53,6 +54,7 @@ class TwoPeptideSimulation:
             platform_properties = dict()
         self.simulation = app.Simulation(self.model.topology, system, integrator, platform, platform_properties)
         self.simulation.context.setPositions(self.model.positions)
+        self._n_dof, self._total_mass = self._compute_n_dof_and_mass()
 
     @property
     def friction(self):
@@ -89,6 +91,50 @@ class TwoPeptideSimulation:
     @property
     def saved_atoms(self):
         return np.sort(self.model.select(TwoPeptideSimulation.ATOM_SELECTION))
+
+    @property
+    def equilibration_stats(self):
+        state = self.simulation.context.getState(getEnergy=True)
+        potential_energy = state.getPotentialEnergy()
+        box_volume = state.getPeriodicBoxVolume()
+        density = box_volume/self._total_mass
+        integrator = self.simulation.context.getIntegrator()
+        if hasattr(integrator, 'computeSystemTemperature'):
+            temperature = integrator.computeSystemTemperature()
+        else:
+            temperature = (2 * state.getKineticEnergy() / (self._n_dof * unit.MOLAR_GAS_CONSTANT_R))
+            
+        return dict(
+            potential_energy=potential_energy.value_in_unit(unit.kilojoule_per_mole),
+            temperature=temperature.value_in_unit(unit.kelvin),
+            density=density.value_in_unit(unit.gram/unit.item/unit.milliliter)
+        )
+
+    def _compute_n_dof_and_mass(self, simulation):
+        """Compute number of degrees of freedom and total mass.
+        from openmm.app.StateDataReporter
+        """
+        system = simulation.system
+
+        # Compute the number of degrees of freedom.
+        dof = 0
+        for i in range(system.getNumParticles()):
+            if system.getParticleMass(i) > 0*unit.dalton:
+                dof += 3
+        for i in range(system.getNumConstraints()):
+            p1, p2, distance = system.getConstraintParameters(i)
+            if system.getParticleMass(p1) > 0*unit.dalton or system.getParticleMass(p2) > 0*unit.dalton:
+                dof -= 1
+        if any(type(system.getForce(i)) == mm.CMMotionRemover for i in range(system.getNumForces())):
+            dof -= 3
+
+        # Compute the total system mass.
+        mass = 0*unit.dalton
+        for i in range(system.getNumParticles()):
+            mass += system.getParticleMass(i)
+
+        return dof, mass
+
 
     #@property
     #def embedding(self):
