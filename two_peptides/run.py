@@ -2,6 +2,8 @@
 
 __all__ = ["run"]
 
+from two_peptides.cli import cli_main
+
 
 import os
 from itertools import product
@@ -72,13 +74,13 @@ def run(
     summary_report.save_energies(filename("energies", npz=True))
 
 
-@click.command()
+@cli_main.command(name="run")
 @click.option("-a", "--aminoacids1", type=click.Choice(VALID_PEPTIDES))
 @click.option("-b", "--aminoacids2", type=click.Choice(VALID_PEPTIDES))
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True, writable=True), default="./data")
 @click.option("-d", "--distances", type=float, multiple=True, default=DEFAULT_DISTANCES.tolist())
 @click.option("--test/--no-test", default=False)
-def main(
+def run_cmd(
         aminoacids1: str,
         aminoacids2: str,
         outdir: str = "./data",
@@ -86,4 +88,3 @@ def main(
         test: bool = False
 ):
     return run(aminoacids1, aminoacids2, outdir, distances, test)
-

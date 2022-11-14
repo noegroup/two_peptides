@@ -8,7 +8,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'two_peptides=two_peptides.run:main',
+            'two_peptides=two_peptides.cli:cli_main',
         ],
     },
     package_data={
