@@ -68,7 +68,7 @@ class PMF:
 
 def potential_of_mean_force(peptide1: str, peptide2: str, rootdir: str) -> PMF:
     """Potential of mean force along the reaction coordinate
-    (the distance between peptide1-beads and peptide2-beads center of mass).
+    (the distance between peptide1-saved_atoms and peptide2-saved_atoms center of mass).
 
     Example
     -------

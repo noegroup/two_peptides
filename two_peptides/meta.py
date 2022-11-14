@@ -8,6 +8,7 @@ import pickle
 from copy import deepcopy
 import contextlib
 import io
+import random
 import numpy as np
 
 
@@ -105,6 +106,7 @@ def fast_folder_pairs():
                 if j >= i:
                     continue
                 pairs_of_pairs.add((pair1, pair2))
+    pairs_of_pairs = random.choices(list(pairs_of_pairs), k=1000)
     with open(cachename, "wb") as f:
         pickle.dump(pairs_of_pairs, f)
     return pairs_of_pairs

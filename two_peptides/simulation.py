@@ -9,11 +9,12 @@ import numpy as np
 from bgmol.systems import TwoMiniPeptides
 from bgmol.util.importing import import_openmm
 from .report import Report
-from .meta import embedding
 mm, unit, app = import_openmm()
 
 
 class TwoPeptideSimulation:
+    ATOM_SELECTION = "protein "
+    
     def __init__(
             self,
             aminoacids1,
@@ -22,8 +23,25 @@ class TwoPeptideSimulation:
             friction=0.1,
             k=500.
     ):
+        """Umbrella simulation of two peptides in OpenMM using the openmm.LangevinMiddleIntegrator.
+        
+        Attributes
+        ----------
+        friction : float
+            Friction coefficient of the Langevin integrator
+        d0 : float
+            Center of the umbrella window; distance between centers of masses in nm
+        k : float
+            Force constant of the umbrella potential in kJ/mol/nm^2
+        atomgroup1 : list of int
+            Atom IDs of saved_atoms belonging to the first peptide
+        atomgroup2 : list of int
+            Atom IDs of saved_atoms belonging to the second peptide
+        saved_atoms : list of int
+            Atom IDs of all peptide saved_atoms
+        """
         self.model = TwoMiniPeptides(aminoacids1=aminoacids1, aminoacids2=aminoacids2)
-        system = add_umbrella(self.model.system, group1=self.beadgroup1, group2=self.beadgroup2, d0=d0, k=k)
+        system = add_umbrella(self.model.system, group1=self.atomgroup1, group2=self.atomgroup2, d0=d0, k=k)
         integrator = mm.LangevinMiddleIntegrator(300. * unit.kelvin, friction / unit.picoseconds, 2.0 * unit.femtoseconds)
         integrator.setConstraintTolerance(1e-7)
         try:
@@ -61,20 +79,20 @@ class TwoPeptideSimulation:
         self.simulation.context.setParameter("k", force_constant)
 
     @property
-    def beadgroup1(self):
-        return self.model.select(CGBEADS + "and resid < 10")
+    def atomgroup1(self):
+        return self.model.select(TwoPeptideSimulation.ATOM_SELECTION + " and resid < 10")
 
     @property
-    def beadgroup2(self):
-        return self.model.select(CGBEADS + "and resid > 10")
+    def atomgroup2(self):
+        return self.model.select(TwoPeptideSimulation.ATOM_SELECTION + " and resid > 10")
 
     @property
-    def beads(self):
-        return np.sort(self.model.select(CGBEADS))
+    def saved_atoms(self):
+        return np.sort(self.model.select(TwoPeptideSimulation.ATOM_SELECTION))
 
-    @property
-    def embedding(self):
-        return np.array([embedding(self.model.mdtraj_topology.atom(i)) for i in self.beads])
+    #@property
+    #def embedding(self):
+    #    return np.array([embedding(self.model.mdtraj_topology.atom(i)) for i in self.saved_atoms])
 
     def minimize(self):
         self.simulation.minimizeEnergy()
@@ -85,8 +103,8 @@ class TwoPeptideSimulation:
     def report(self) -> Report:
         return Report.from_context(
             self.simulation.context,
-            atom_ids=self.beads,
-            center_group=self.beadgroup1,
+            atom_ids=self.saved_atoms,
+            center_group=self.atomgroup1,
             topology=self.model.mdtraj_topology
         )
 
@@ -120,13 +138,3 @@ def add_umbrella(system, group1, group2, d0=3.0, k=500.0):
 
 def copy_system(source: mm.System):
     return mm.XmlSerializer.deserializeSystem(mm.XmlSerializer.serializeSystem(source))
-
-
-#CGBEADS = (
-#    "not water "
-#    "and resname != ACE "
-#    "and resname != NME "
-#    "and (backbone or name CB) "
-#)
-
-CGBEADS = "protein "

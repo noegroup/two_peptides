@@ -39,7 +39,7 @@ def run(
         )
     assert not os.path.exists(filename("coord"))
     assert not os.path.exists(filename("force"))
-    assert not os.path.exists(filename("embed"))
+    assert not os.path.exists(filename("pdb"))
     assert not os.path.exists(filename("energies", npz=True))
 
     simulation = TwoPeptideSimulation(aminoacids1, aminoacids2)
@@ -69,7 +69,6 @@ def run(
     summary_report = Report.from_reports(*reports)
     np.save(filename("coord"), summary_report.positions)
     np.save(filename("force"), summary_report.unbiased_forces)
-    np.save(filename("embed"), simulation.embedding)
     summary_report.save_energies(filename("energies", npz=True))
 
 
