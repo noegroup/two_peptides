@@ -2,9 +2,6 @@
 
 __all__ = ["run"]
 
-from two_peptides.cli import cli_main
-
-
 import os
 from itertools import product
 from typing import Sequence
@@ -74,7 +71,7 @@ def run(
     summary_report.save_energies(filename("energies", npz=True))
 
 
-@cli_main.command(name="run")
+@click.command(name="run")
 @click.option("-a", "--aminoacids1", type=click.Choice(VALID_PEPTIDES))
 @click.option("-b", "--aminoacids2", type=click.Choice(VALID_PEPTIDES))
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True, writable=True), default="./data")

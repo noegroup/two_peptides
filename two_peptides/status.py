@@ -8,8 +8,6 @@ from subprocess import Popen, PIPE
 
 from bgmol.systems.minipeptides import AMINO_ACIDS
 from two_peptides.meta import fast_folder_pairs
-from two_peptides.cli import cli_main
-
 
 def submitted():
     for a in AMINO_ACIDS:
@@ -67,7 +65,7 @@ def _determine_status(peptide1, peptide2, outdir, squeue_dict):
         return "E"
 
 
-@cli_main.command(name="status")
+@click.command(name="status")
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True), default="./data")
 @click.option("--detailed/--no-detailed", default=False)
 def status_cmd(outdir, detailed):

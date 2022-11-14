@@ -27,8 +27,9 @@ def submit(a,b):
         os.system(command)
 
 
-for a, b in submitted():
-    if not (is_finished(a, b) or is_finished(b, a)):
-        print(a, b)
-        submit(a, b)
-        time.sleep(0.5)
+if __name__ == "__main__":
+    for a, b in submitted():
+        if not (is_finished(a, b) or is_finished(b, a)):
+            print(a, b)
+            submit(a, b)
+            time.sleep(0.5)
