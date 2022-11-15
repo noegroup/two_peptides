@@ -36,7 +36,7 @@ class Report:
             unbiased_energy=_energy(unbiased_state),
             bias_energy=_energy(bias_state),
             box=full_state.getPeriodicBoxVectors(asNumpy=True),
-            distance=_centroid_distance(full_state),
+            distance=centroid_distance(full_state),
             d0=full_state.getParameters()["d0"],
             k=full_state.getParameters()["k"]
         )
@@ -108,7 +108,7 @@ def _energy(state: mm.State):
     return state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole)
 
 
-def _centroid_distance(state: mm.State):
+def centroid_distance(state: mm.State):
     du_dd = state.getEnergyParameterDerivatives()["d0"]
     k = state.getParameters()["k"]
     d0 = state.getParameters()["d0"]

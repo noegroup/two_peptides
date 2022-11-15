@@ -5,11 +5,11 @@ __all__ = ["TwoPeptideSimulation", "barostat"]
 import warnings
 import contextlib
 import numpy as np
-import openmm
 
 from bgmol.systems import TwoMiniPeptides
 from bgmol.util.importing import import_openmm
 from .report import Report
+from .sanity import EquilibrationStats
 mm, unit, app = import_openmm()
 
 
@@ -54,7 +54,8 @@ class TwoPeptideSimulation:
             platform_properties = dict()
         self.simulation = app.Simulation(self.model.topology, system, integrator, platform, platform_properties)
         self.simulation.context.setPositions(self.model.positions)
-        self._n_dof, self._total_mass = self._compute_n_dof_and_mass()
+        self._n_dof, self._total_mass = _compute_n_dof_and_mass(self.simulation)
+        self.stats = EquilibrationStats.empty()
 
     @property
     def friction(self):
@@ -92,59 +93,15 @@ class TwoPeptideSimulation:
     def saved_atoms(self):
         return np.sort(self.model.select(TwoPeptideSimulation.ATOM_SELECTION))
 
-    @property
-    def equilibration_stats(self):
-        state = self.simulation.context.getState(getEnergy=True)
-        potential_energy = state.getPotentialEnergy()
-        box_volume = state.getPeriodicBoxVolume()
-        density = box_volume/self._total_mass
-        integrator = self.simulation.context.getIntegrator()
-        if hasattr(integrator, 'computeSystemTemperature'):
-            temperature = integrator.computeSystemTemperature()
-        else:
-            temperature = (2 * state.getKineticEnergy() / (self._n_dof * unit.MOLAR_GAS_CONSTANT_R))
-            
-        return dict(
-            potential_energy=potential_energy.value_in_unit(unit.kilojoule_per_mole),
-            temperature=temperature.value_in_unit(unit.kelvin),
-            density=density.value_in_unit(unit.gram/unit.item/unit.milliliter)
-        )
-
-    def _compute_n_dof_and_mass(self, simulation):
-        """Compute number of degrees of freedom and total mass.
-        from openmm.app.StateDataReporter
-        """
-        system = simulation.system
-
-        # Compute the number of degrees of freedom.
-        dof = 0
-        for i in range(system.getNumParticles()):
-            if system.getParticleMass(i) > 0*unit.dalton:
-                dof += 3
-        for i in range(system.getNumConstraints()):
-            p1, p2, distance = system.getConstraintParameters(i)
-            if system.getParticleMass(p1) > 0*unit.dalton or system.getParticleMass(p2) > 0*unit.dalton:
-                dof -= 1
-        if any(type(system.getForce(i)) == mm.CMMotionRemover for i in range(system.getNumForces())):
-            dof -= 3
-
-        # Compute the total system mass.
-        mass = 0*unit.dalton
-        for i in range(system.getNumParticles()):
-            mass += system.getParticleMass(i)
-
-        return dof, mass
-
-
-    #@property
-    #def embedding(self):
-    #    return np.array([embedding(self.model.mdtraj_topology.atom(i)) for i in self.saved_atoms])
-
     def minimize(self):
         self.simulation.minimizeEnergy()
 
-    def step(self, steps):
-        self.simulation.step(steps)
+    def step(self, steps, log_stats_interval=500, production=False):
+        self.stats = self.stats.append(EquilibrationStats.from_simulation(self, production=production))
+        for step in range(steps // log_stats_interval):
+            self.simulation.step(log_stats_interval)
+            self.stats = self.stats.append(EquilibrationStats.from_simulation(self, production=production))
+        self.simulation.step(steps % log_stats_interval)
 
     def report(self) -> Report:
         return Report.from_context(
@@ -153,6 +110,9 @@ class TwoPeptideSimulation:
             center_group=self.atomgroup1,
             topology=self.model.mdtraj_topology
         )
+
+    def write_stats(self, filename):
+        self.stats.save(filename)
 
 
 @contextlib.contextmanager
@@ -184,3 +144,29 @@ def add_umbrella(system, group1, group2, d0=3.0, k=500.0):
 
 def copy_system(source: mm.System):
     return mm.XmlSerializer.deserializeSystem(mm.XmlSerializer.serializeSystem(source))
+
+
+def _compute_n_dof_and_mass(simulation):
+    """Compute number of degrees of freedom and total mass.
+    from openmm.app.StateDataReporter
+    """
+    system = simulation.system
+
+    # Compute the number of degrees of freedom.
+    dof = 0
+    for i in range(system.getNumParticles()):
+        if system.getParticleMass(i) > 0*unit.dalton:
+            dof += 3
+    for i in range(system.getNumConstraints()):
+        p1, p2, distance = system.getConstraintParameters(i)
+        if system.getParticleMass(p1) > 0*unit.dalton or system.getParticleMass(p2) > 0*unit.dalton:
+            dof -= 1
+    if any(type(system.getForce(i)) == mm.CMMotionRemover for i in range(system.getNumForces())):
+        dof -= 3
+
+    # Compute the total system mass.
+    mass = 0*unit.dalton
+    for i in range(system.getNumParticles()):
+        mass += system.getParticleMass(i)
+
+    return dof, mass

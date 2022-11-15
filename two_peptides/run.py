@@ -13,6 +13,7 @@ from bgmol.systems.minipeptides import AMINO_ACIDS
 from .simulation import TwoPeptideSimulation, barostat
 from .report import Report
 from .meta import DEFAULT_DISTANCES
+from .pdb import save_pdb
 
 
 VALID_PEPTIDES = (
@@ -29,17 +30,20 @@ def run(
         distances: Sequence[float] = DEFAULT_DISTANCES,
         test: bool = False
 ):
-    def filename(suffix, is_test=test, npz=False):
+    def filename(name, is_test=test, suffix="npy"):
         return os.path.join(
             outdir,
             f"{'test_' if is_test else ''}"
-            f"{aminoacids1}_{aminoacids2}_{suffix}."
-            f"{'npz' if npz else 'npy'}"
+            f"{aminoacids1}_{aminoacids2}_{name}."
+            f"{suffix}"
         )
     assert not os.path.exists(filename("coord"))
     assert not os.path.exists(filename("force"))
-    assert not os.path.exists(filename("pdb"))
-    assert not os.path.exists(filename("energies", npz=True))
+    assert not os.path.exists(filename("solute", suffix="pdb"))
+    assert not os.path.exists(filename("energies", suffix="npz"))
+    assert not os.path.exists(filename("equilibration", suffix="txt"))
+
+    save_pdb(aminoacids1, aminoacids2, filename("solute", suffix="pdb"), selection="protein")
 
     simulation = TwoPeptideSimulation(aminoacids1, aminoacids2)
     simulation.d0 = distances[0]
@@ -55,8 +59,8 @@ def run(
 
     reports = []
 
-    for distance in distances:
-        print(f"d: {distance:.2f}")
+    for i, distance in enumerate(distances):
+        print(f"... starting umbrella {i} / {len(distances)}")
         # equilibrate
         simulation.d0 = distance
         simulation.friction = 100.
@@ -64,15 +68,15 @@ def run(
         simulation.friction = 0.1
         for _ in range(5):
             simulation.step(1 if test else 5000)
-            print(simulation.equilibration_stats)
         for i in range(10 if test else 1000):
-            simulation.step(1 if test else 500)
+            simulation.step(1 if test else 500, production=True)
             reports.append(simulation.report())
 
     summary_report = Report.from_reports(*reports)
     np.save(filename("coord"), summary_report.positions)
     np.save(filename("force"), summary_report.unbiased_forces)
-    summary_report.save_energies(filename("energies", npz=True))
+    summary_report.save_energies(filename("energies", suffix="npz"))
+    simulation.write_stats(filename("equilibration", suffix="txt"))
 
 
 @click.command(name="run")
