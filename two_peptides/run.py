@@ -49,7 +49,7 @@ def run(
     simulation.d0 = distances[0]
     simulation.k = 1. if test else 500.
 
-    print("Equilibrating")
+    print("Equilibrating", flush=True)
     with barostat(simulation.simulation):
         simulation.minimize()
         simulation.friction = 100.
@@ -60,7 +60,7 @@ def run(
     reports = []
 
     for i, distance in enumerate(distances):
-        print(f"... starting umbrella {i} / {len(distances)}")
+        print(f"... starting umbrella {i} / {len(distances)}", flush=True)
         # equilibrate
         simulation.d0 = distance
         simulation.friction = 100.
