@@ -45,6 +45,7 @@ def run(
     save_pdb(aminoacids1, aminoacids2, filename("solute", suffix="pdb"), selection="protein")
 
     simulation = TwoPeptideSimulation(aminoacids1, aminoacids2)
+    simulation.save_pdb()
     simulation.d0 = distances[0]
     simulation.k = 1. if test else 500.
 

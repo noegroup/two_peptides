@@ -8,6 +8,7 @@ import numpy as np
 
 from bgmol.systems import TwoMiniPeptides
 from bgmol.util.importing import import_openmm
+import mdtraj as md
 from .report import Report
 from .sanity import EquilibrationStats
 mm, unit, app = import_openmm()
@@ -113,6 +114,12 @@ class TwoPeptideSimulation:
 
     def write_stats(self, filename):
         self.stats.save(filename)
+
+    def save_pdb(self, filename, selection="saved_atoms"):
+        selected = {"saved_atoms": self.saved_atoms, "protein": self.model.select("protein")}[selection]
+        traj = md.Trajectory(self.model.positions[selected], topology=self.model.mdtraj_topology.subset(selected))
+        traj.save_pdb(filename)
+
 
 
 @contextlib.contextmanager
