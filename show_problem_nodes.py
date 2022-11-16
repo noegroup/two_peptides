@@ -1,3 +1,4 @@
+import os
 
 from glob import glob
 
@@ -18,5 +19,6 @@ logs = glob("log/sim_*_*.log")
 
 for log in logs:
     if has_error(log):
+        #os.remove(log)
         print(show_device(log))
 
