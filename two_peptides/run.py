@@ -42,7 +42,7 @@ def run(
     assert not os.path.exists(filename("energies", suffix="npz"))
     assert not os.path.exists(filename("equilibration", suffix="txt"))
 
-    print("Running on node", socket.gethostname(), "using GPU id", os.getenv("SLURM_STEP_GPUS", default="NO GPU"))
+    print("Running on node", socket.gethostname(), "using GPU id", os.getenv("SLURM_JOB_GPUS", default="NO GPU"))
 
     simulation = TwoPeptideSimulation(aminoacids1, aminoacids2)
     simulation.save_pdb(filename("solute", suffix="pdb"), selection="saved_atoms")
