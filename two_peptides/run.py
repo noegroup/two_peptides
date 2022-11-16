@@ -3,6 +3,7 @@
 __all__ = ["run"]
 
 import os
+import socket
 from itertools import product
 from typing import Sequence
 import numpy as np
@@ -13,7 +14,6 @@ from bgmol.systems.minipeptides import AMINO_ACIDS
 from .simulation import TwoPeptideSimulation, barostat
 from .report import Report
 from .meta import DEFAULT_DISTANCES
-from .pdb import save_pdb
 
 
 VALID_PEPTIDES = (
@@ -42,10 +42,10 @@ def run(
     assert not os.path.exists(filename("energies", suffix="npz"))
     assert not os.path.exists(filename("equilibration", suffix="txt"))
 
-    save_pdb(aminoacids1, aminoacids2, filename("solute", suffix="pdb"), selection="protein")
+    print("Running on node", socket.gethostname(), "using GPU id", os.getenv("SLURM_STEP_GPUS", default="NO GPU"))
 
     simulation = TwoPeptideSimulation(aminoacids1, aminoacids2)
-    simulation.save_pdb()
+    simulation.save_pdb(filename("solute", suffix="pdb"), selection="saved_atoms")
     simulation.d0 = distances[0]
     simulation.k = 1. if test else 500.
 
