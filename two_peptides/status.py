@@ -19,19 +19,20 @@ def submitted():
 
 
 def is_finished(a, b, outdir="./data"):
-    def filename(suffix, npz=False):
+    def filename(name, suffix="npy"):
         return os.path.join(
             outdir,
-            f"{a}_{b}_{suffix}."
-            f"{'npz' if npz else 'npy'}"
+            f"{a}_{b}_{name}."
+            f"{suffix}"
         )
+
     if not os.path.exists(filename("coord")):
         return False
     if not os.path.exists(filename("force")):
         return False
-    if not os.path.exists(filename("embed")):
+    if not os.path.exists(filename("energies",  suffix="npz")):
         return False
-    if not os.path.exists(filename("energies", npz=True)):
+    if not os.path.exists(filename("equilibration",  suffix="txt")):
         return False
     return True
 

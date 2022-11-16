@@ -39,7 +39,6 @@ def run(
         )
     assert not os.path.exists(filename("coord"))
     assert not os.path.exists(filename("force"))
-    assert not os.path.exists(filename("solute", suffix="pdb"))
     assert not os.path.exists(filename("energies", suffix="npz"))
     assert not os.path.exists(filename("equilibration", suffix="txt"))
 
