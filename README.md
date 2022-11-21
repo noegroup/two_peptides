@@ -14,55 +14,22 @@ The forces are unbiased forces in units of kJ/mol/nm.
 Units are converted to Angstrom and kcal/mol/A when loading the
 `TwoPeptidesDataset`.
 
-## Use the dataset
-To load all available data:
+## Loading and processing Data
+Raw simulation output is located in the subdirectory `data`. 
+Using this raw output directly is not recommended, as the peptide coordinates are not properly wrapped
+in the primary unit cell. 
 
-```python
-from two_peptides.dataset import TwoPeptidesDataset
-dataset = TwoPeptidesDataset(
-    coordglob="<DATADIR>/*_coord.npy",
-    forceglob="<DATADIR>/*_force.npy",
-    embedglob="<DATADIR>/*_embed.npy",
-)
-```
-All energies are in kcal/mol.
-All coordinates are in Angstrom.
-Embedding follows Nick's convention.
+Processed all-atom data is located in the file ```/import/a12/users/kraemea88/two_peptides/data/allatom.h5```
+The file structure is as follows
 
-To split the dataset into training and validation in a determinstic manner,
-you can do
-```python
-from two_peptides.dataset import TwoPeptidesDataset
-dataset = TwoPeptidesDataset(...)
-trainset, valset = dataset.split(val_fraction=0.2)
-```
 
-To combine this dataset with another `InMemoryDataset`, 
-you can add the two datasets together.
-```python
-other_dataset = ...
-dataset = TwoPeptidesDataset(...)
-total_dataset = dataset + other_dataset
-```
 
-The dataset can be used within a `torch_geometric.DataLoader`:
 ```python
 from torch_geometric.data import DataLoader
 loader = DataLoader(dataset, shuffle=True, batch_size=256)
 for batch in loader:
     ...
 ```
-## Other Types of Analysis
-To analyse the potential of mean force, check
-```python
-from two_peptides.dataset import potential_of_mean_force
-help(potential_of_mean_force)
-```
-**Caveat**: The potential of mean force is not accurate.
-It does not include the volume transformation term of the reaction coordinate.
-Note that this term is quite intricate when using rectangular boxes and distances > half the box length.
-
-
 
 ## Requirements
 ### Mandatory:
@@ -90,6 +57,6 @@ Umbrella sampling was run using
 - 2 fs time step
 - 0.1 / ps friction constant
 - a force constant of 500. kJ/mol/nm^2
-- umbrella windows over the centroid bond distance from 4 to 40 Angstrom spaced in 1A intervals
+- umbrella windows over the centroid bond distance from 3 to 30 Angstrom spaced in 1A intervals
 - each simuation is equilibrated in NPT for 300 ps
 - for each umbrella, the simulation is run for 1 ns. Coordinate/force pairs are saved every 1 ps.

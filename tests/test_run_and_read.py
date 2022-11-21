@@ -3,7 +3,7 @@
 from torch_geometric.data import DataLoader
 from two_peptides.run import run
 from two_peptides.meta import DEFAULT_DISTANCES
-from two_peptides.dataset import TwoPeptidesDataset
+from two_peptides.pmf import TwoPeptidesDataset
 
 
 def test_run_and_read(tmpdir):

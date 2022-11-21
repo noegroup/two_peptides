@@ -1,62 +1,13 @@
 
 
-__all__ = ["TwoPeptidesDataset", "potential_of_mean_force"]
+__all__ = ["potential_of_mean_force"]
 
 
 import os
-from typing import Union, List, Tuple
 
 import numpy as np
 from dataclasses import dataclass
 from .meta import DEFAULT_DISTANCES
-from torchmdnet.datasets.in_mem_dataset import InMemoryDataset
-
-
-class TwoPeptidesDataset(InMemoryDataset):
-    """Pairs of small peptides in solution.
-    """
-    def __init__(self, coordglob, forceglob, embedglob, stride=1):
-        super().__init__(coordglob, forceglob, embedglob, stride=stride)
-        # unit conversion
-        self.coord_list = [_nanometer_to_angstrom(c) for c in self.coord_list]
-        self.force_list = [_kj_per_mol_and_nm_to_kcal_per_mol_and_angstrom(f) for f in self.force_list]
-
-    def split(self, val_fraction: float, random_seed: int = 1) -> Tuple["TwoPeptidesDataset", "TwoPeptidesDataset"]:
-        """deterministic split into two datasets"""
-        n_files = len(self.coord_list)
-        random_state = np.random.get_state()
-        np.random.seed(random_seed)
-        np.random.permutation(n_files)
-        n_train = int((1.0 - val_fraction) * n_files)
-        trainset = TwoPeptidesDataset("", "", "")
-        valset = TwoPeptidesDataset("", "", "")
-        trainset.coord_list = self.coord_list[:n_train]
-        valset.coord_list = self.coord_list[n_train:]
-        trainset.force_list = self.force_list[:n_train]
-        valset.force_list = self.force_list[n_train:]
-        trainset.embedding_list = self.embedding_list[:n_train]
-        valset.embedding_list = self.embedding_list[n_train:]
-        trainset.index = _make_index(trainset.coord_list)
-        valset.index = _make_index(valset.coord_list)
-        np.random.set_state(random_state)
-        return trainset, valset
-
-    def __add__(self, other: InMemoryDataset) -> InMemoryDataset:
-        assert isinstance(other, InMemoryDataset)
-        dataset = InMemoryDataset("", "", "")
-        dataset.coord_list = self.coord_list + other.coord_list
-        dataset.force_list = self.force_list + other.force_list
-        dataset.embedding_list = self.embedding_list + other.embedding_list
-        dataset.index = _make_index(dataset.coord_list)
-        return dataset
-
-
-def _make_index(coord_list):
-    index = []
-    for i, coords in enumerate(coord_list):
-        size = len(coords)
-        index.extend(list(zip([i] * size, range(size))))
-    return index
 
 
 @dataclass
@@ -70,11 +21,13 @@ def potential_of_mean_force(peptide1: str, peptide2: str, rootdir: str) -> PMF:
     """Potential of mean force along the reaction coordinate
     (the distance between peptide1-saved_atoms and peptide2-saved_atoms center of mass).
 
+    Note: the PMF is not exact at large distances, as the radial shells are not spheres in a periodic box
+
     Example
     -------
 
     Plot the PMF between Ala and Tyr2 from the energies file in the current dir:
-    >>> from two_peptides.dataset import potential_of_mean_force
+    >>> from two_peptides.pmf import potential_of_mean_force
     >>> pmf = potential_of_mean_force("A", "YY", rootdir="./")
     >>> plt.plot(pmf.bin_centers, pmf.free_energy)
     >>> plt.fill_between(
