@@ -9,7 +9,6 @@ import operator
 import numpy as np
 import mdtraj as md
 from dataclasses import dataclass
-from two_peptides.status import submitted
 from tqdm.auto import tqdm
 
 
@@ -82,7 +81,7 @@ class TwoPeptideSimulationOutput:
         h5group.attrs["topology"] = topology_to_ascii(top)
         h5group.create_dataset("aa_coords", shape=(nframes, natoms, 3), dtype=np.float32, data=trajectory.xyz)
         h5group.create_dataset("aa_forces", shape=(nframes, natoms, 3), dtype=np.float32, data=forces)
-        h5group.create_dataset("box_vectors", shape=(nframes, 3, 3), dtype=np.float32, data=forces)
+        h5group.create_dataset("box_vectors", shape=(nframes, 3, 3), dtype=np.float32, data=box_vectors)
         h5group.create_dataset("unbiased_energy", shape=(nframes,), dtype=np.float32, data=energy_output["unbiased_energy"])
         h5group.create_dataset("bias_energy", shape=(nframes,), dtype=np.float32, data=energy_output["bias_energy"])
         h5group.create_dataset("distance", shape=(nframes,), dtype=np.float32, data=energy_output["distance"])
@@ -196,6 +195,7 @@ def string_to_topology(ascii_string):
 @click.option("-b", "--aminoacids2", default=None)
 def to_h5_cmd(destination, many, aminoacids1, aminoacids2):
     """convert simulation output to h5"""
+    from two_peptides.status import submitted
     if many:
         dimers = submitted()
     else:
