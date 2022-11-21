@@ -202,9 +202,9 @@ def to_h5_cmd(destination, many, aminoacids1, aminoacids2):
         assert aminoacids1 is not None and aminoacids2 is not None
         dimers = ((aminoacids1, aminoacids2), )
 
-    for twopep in pbar := tqdm(dimers):
+    for twopep in tqdm(dimers):
         sim_output = TwoPeptideSimulationOutput(*twopep)
-        pbar.desc = str(sim_output)
+        #pbar.desc = str(sim_output)
         sim_output.write_to_h5(destination)
 
 
