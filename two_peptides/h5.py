@@ -204,7 +204,6 @@ def to_h5_cmd(destination, many, aminoacids1, aminoacids2):
     pbar = tqdm(dimers)
     for twopep in pbar:
         sim_output = TwoPeptideSimulationOutput(*twopep)
-        print(sim_output)
         if not os.path.exists(sim_output.pdb):
             print(sim_output.pdb, "does not exist. Skipping")
             continue
