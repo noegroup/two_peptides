@@ -88,12 +88,10 @@ class TwoPeptideSimulationOutput:
         h5group.create_dataset("d0", shape=(nframes,), dtype=np.float32, data=energy_output["d0"])
         h5group.create_dataset("k", shape=(nframes,), dtype=np.float32, data=energy_output["k"])
 
-    def get_h5group(self, destination, overwrite=False):
-        if os.path.exists(destination) and not overwrite:
-            raise FileExistsError(f"File {destination} exists and overwrite=False.")
+    def get_h5group(self, destination):
         h5 = h5py.File(destination, "a")
         main_group = h5.require_group("MINI")
-        main_group.attrs["description"] = """Simulation
+        main_group.attrs["description"] = """Simulation output
         """
         h5group = main_group.require_group(str(self))
         return h5group
