@@ -20,7 +20,7 @@ class TwoPeptideSimulationOutput:
     _topology: md.Topology = None
 
     def filename(self, name, suffix):
-        return f"../data/{self.peptide1}_{self.peptide2}_{name}.{suffix}"
+        return f"data/{self.peptide1}_{self.peptide2}_{name}.{suffix}"
 
     @property
     def pdb(self):
@@ -189,12 +189,13 @@ def string_to_topology(ascii_string):
     return topology
 
 
-@click.command
+@click.command(name="to-h5")
 @click.option("-d", "--destination", type=click.Path(dir_okay=False), default="./data/allatom.h5")
 @click.option("--many/--no-many", default=False)
 @click.option("-a", "--aminoacids1", default=None)
 @click.option("-b", "--aminoacids2", default=None)
-def to_h5(destination, many, aminoacids1, aminoacids2):
+def to_h5_cmd(destination, many, aminoacids1, aminoacids2):
+    """convert simulation output to h5"""
     if many:
         dimers = submitted()
     else:
