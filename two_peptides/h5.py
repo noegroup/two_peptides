@@ -200,16 +200,23 @@ def to_h5_cmd(destination, many, aminoacids1, aminoacids2):
         assert aminoacids1 is not None and aminoacids2 is not None
         dimers = ((aminoacids1, aminoacids2), )
 
-    for twopep in tqdm(dimers):
+    dimers = list(dimers)
+    pbar = tqdm(dimers)
+    for twopep in pbar:
         sim_output = TwoPeptideSimulationOutput(*twopep)
+        print(sim_output)
         if not os.path.exists(sim_output.pdb):
             print(sim_output.pdb, "does not exist. Skipping")
             continue
         if not os.path.exists(sim_output.coordinate_file):
             print(sim_output.pdb, "does not exist. Skipping")
             continue
-        #pbar.desc = str(sim_output)
-        sim_output.write_to_h5(destination)
+        pbar.desc = str(sim_output)
+        try:
+            sim_output.write_to_h5(destination)
+        except Exception as e:
+            print(e)
+            continue
 
 
 
