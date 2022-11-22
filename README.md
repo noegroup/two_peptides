@@ -18,6 +18,7 @@ For an example on how to use it, see `example_usage.ipynb`.
 
 TL;DR: 
 ```python
+DATA_FILE = "/import/a12/users/kraemea88/two_peptides/data/allatom.h5"
 with h5py.File(DATA_FILE, "r") as data:
     print(data["MINI"])
     print("Available Data:", list(data["MINI"]["IL_LF"].keys()))
@@ -42,7 +43,7 @@ Raw simulation output is located in the subdirectory `data/raw`.
 Using this raw output directly is not recommended, as the peptide coordinates are not properly wrapped
 in the primary unit cell. 
 
-Cap embeddings...
+All minipeptides are capped.
 
 ## Requirements
 ### Mandatory:
