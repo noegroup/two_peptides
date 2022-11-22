@@ -2,7 +2,7 @@
 # Simulation Data for Pairs of Small Peptides
 
 Umbrella sampling between two peptides 
-covering distances from 4 A to 30 A.
+covering distances from 3 A to 30 A.
 The distances are measured between the centers-of-mass
 of the "saved_atoms" in peptide 1 and 2.
 
@@ -11,32 +11,23 @@ Data is located in `/import/a12/users/kraemea88/two_peptides`.
 ## Units
 The coordinates in data files are in units of nanometers.
 The forces are unbiased forces in units of kJ/mol/nm.
-Units are converted to Angstrom and kcal/mol/A when loading the
-`TwoPeptidesDataset`.
 
 ## Loading and processing Data
+Processed all-atom data is located in the file ```/import/a12/users/kraemea88/two_peptides/data/allatom.h5```
+For an example on how to use it, see `example_usage.ipynb`.
+
+## Caveats
 Raw simulation output is located in the subdirectory `data`. 
 Using this raw output directly is not recommended, as the peptide coordinates are not properly wrapped
 in the primary unit cell. 
 
-Processed all-atom data is located in the file ```/import/a12/users/kraemea88/two_peptides/data/allatom.h5```
-The file structure is as follows
-
-
-
-```python
-from torch_geometric.data import DataLoader
-loader = DataLoader(dataset, shuffle=True, batch_size=256)
-for batch in loader:
-    ...
-```
+Cap embeddings...
 
 ## Requirements
 ### Mandatory:
 - numpy
 
 ### Optional:
-- `torchmd_net` (for loading datasets)
 - `pymbar` (for computing PMFs)
 - `openmm` (for running simulations)
 - `click` (for using the command-line interface)
