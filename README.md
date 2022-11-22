@@ -16,8 +16,29 @@ The forces are unbiased forces in units of kJ/mol/nm.
 Processed all-atom data is located in the file ```/import/a12/users/kraemea88/two_peptides/data/allatom.h5```
 For an example on how to use it, see `example_usage.ipynb`.
 
+TL;DR: 
+```python
+with h5py.File(DATA_FILE, "r") as data:
+    print(data["MINI"])
+    print("Available Data:", list(data["MINI"]["IL_LF"].keys()))
+    print("Coordinate shape:", data["MINI"]["IL_LF"]["aa_coords"].shape)
+    
+    from two_peptides.h5 import string_to_topology
+    print(string_to_topology(data["MINI"]["IL_LF"].attrs["topology"]))
+```
+
+gives
+```
+<HDF5 group "/MINI" (1213 members)>
+Available Data: ['aa_coords', 'aa_forces', 'bias_energy', 'box_vectors', 'd0', 'distance', 'k', 'unbiased_energy']
+Coordinate shape: (27000, 101, 3)
+<mdtraj.Topology with 2 chains, 8 residues, 101 atoms, 124 bonds>
+```
+
+
+
 ## Caveats
-Raw simulation output is located in the subdirectory `data`. 
+Raw simulation output is located in the subdirectory `data/raw`. 
 Using this raw output directly is not recommended, as the peptide coordinates are not properly wrapped
 in the primary unit cell. 
 
