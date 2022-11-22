@@ -15,6 +15,9 @@ cli_main.add_command(status_cmd)
 from .h5 import to_h5_cmd
 cli_main.add_command(to_h5_cmd)
 
+from .sanity import sanity_check_cmd
+cli_main.add_command(sanity_check_cmd)
+
 if __name__ == "__main__":
     cli_main()
 
