@@ -55,6 +55,7 @@ All minipeptides are capped.
 - `click` (for using the command-line interface)
 - `bgmol` (branch `two_peptides`; for simulations and analysis)
 - `mdtraj` (for simulations and analysis)
+- `h5py` (for processing simulation output)
 
 
 ## Simulation Settings
