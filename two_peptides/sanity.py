@@ -11,6 +11,9 @@ from openmm import unit
 from mdtraj.utils import box_vectors_to_lengths_and_angles
 from bgmol.systems import TwoMiniPeptides
 from .report import centroid_distance
+from .run import VALID_PEPTIDES
+from .meta import DEFAULT_DISTANCES
+from typing import Sequence
 
 
 @dataclasses.dataclass()
@@ -92,3 +95,30 @@ class EquilibrationStats:
     def header(self):
         return " ".join(f"{key:>14}" for key in dataclasses.asdict(self).keys())
 
+
+@click.command(name="sanity-check")
+@click.option("-a", "--aminoacids1", type=click.Choice(VALID_PEPTIDES))
+@click.option("-b", "--aminoacids2", type=click.Choice(VALID_PEPTIDES))
+@click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True, writable=True), default="./data")
+@click.option("-d", "--distances", type=float, multiple=True, default=DEFAULT_DISTANCES.tolist())
+@click.option("--test/--no-test", default=False)
+def sanity_check_cmd(
+        aminoacids1: str,
+        aminoacids2: str,
+        outdir: str = "./data",
+):
+    """Run simulation of peptide dimer.
+    Example: `two_peptides run -a AA -b YY` will run umbrella sampling between dialanine and dityrosine
+    and save the results to a subdirectory data.
+    """
+    equi_file = EquilibrationStats.from_array(np.load(os.path.join(outdir, f"{aminoacids1}_{aminoacids2}_equilibration.txt")))
+    density_ok = check_up_down(equi_file.density[300:600])
+    density_unity = equi_file.density[-1] > 0.95 and equi_file.density[-1] > 1.05
+    print(density_ok, density_unity)
+
+
+def check_up_down(time_series, tol=0.1):
+    increase = time_series[1:] > time_series[:-1] + 1e-10
+    decrease = time_series[1:] < time_series[:-1] - 1e-10
+    increase_fraction = increase.sum() / decrease.sum()
+    return increase_fraction > 1. - tol and increase < 1. + tol
