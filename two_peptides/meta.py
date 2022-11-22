@@ -9,8 +9,10 @@ from copy import deepcopy
 import contextlib
 import io
 import random
-import numpy as np
+from itertools import product
 
+import numpy as np
+from bgmol.systems import AMINO_ACIDS
 
 DEFAULT_DISTANCES = np.arange(3.0, 0.3, -0.1)
 
@@ -110,3 +112,10 @@ def fast_folder_pairs():
     with open(cachename, "wb") as f:
         pickle.dump(pairs_of_pairs, f)
     return pairs_of_pairs
+
+
+VALID_PEPTIDES = (
+    list(AMINO_ACIDS.keys())
+    +
+    ["".join(x) for x in product(list(AMINO_ACIDS.keys()), list(AMINO_ACIDS.keys()))]
+)

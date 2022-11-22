@@ -4,23 +4,14 @@ __all__ = ["run"]
 
 import os
 import socket
-from itertools import product
 from typing import Sequence
 import numpy as np
 
 import click
 
-from bgmol.systems.minipeptides import AMINO_ACIDS
 from .simulation import TwoPeptideSimulation, barostat
 from .report import Report
-from .meta import DEFAULT_DISTANCES
-
-
-VALID_PEPTIDES = (
-    list(AMINO_ACIDS.keys())
-    +
-    ["".join(x) for x in product(list(AMINO_ACIDS.keys()), list(AMINO_ACIDS.keys()))]
-)
+from .meta import DEFAULT_DISTANCES, VALID_PEPTIDES
 
 
 def run(

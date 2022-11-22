@@ -1,19 +1,13 @@
 """Sanity checks"""
 
 import os
-import glob
 import dataclasses
 from typing import Union
 import numpy as np
 import click
-import mdtraj as md
 from openmm import unit
-from mdtraj.utils import box_vectors_to_lengths_and_angles
-from bgmol.systems import TwoMiniPeptides
 from .report import centroid_distance
-from .run import VALID_PEPTIDES
-from .meta import DEFAULT_DISTANCES
-from typing import Sequence
+from .meta import DEFAULT_DISTANCES, VALID_PEPTIDES
 
 
 @dataclasses.dataclass()
