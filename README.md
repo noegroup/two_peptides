@@ -19,6 +19,7 @@ For an example on how to use it, see `example_usage.ipynb`.
 TL;DR: 
 ```python
 DATA_FILE = "/import/a12/users/kraemea88/two_peptides/data/allatom.h5"
+import h5py
 with h5py.File(DATA_FILE, "r") as data:
     print(data["MINI"])
     print("Available Data:", list(data["MINI"]["IL_LF"].keys()))
@@ -36,6 +37,8 @@ Coordinate shape: (27000, 101, 3)
 <mdtraj.Topology with 2 chains, 8 residues, 101 atoms, 124 bonds>
 ```
 
+Note that access to the data directory can be very slow.
+It makes sense to work on a local copy of the data file instead.
 
 
 ## Caveats
