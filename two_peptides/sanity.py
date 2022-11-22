@@ -94,8 +94,6 @@ class EquilibrationStats:
 @click.option("-a", "--aminoacids1", type=click.Choice(VALID_PEPTIDES))
 @click.option("-b", "--aminoacids2", type=click.Choice(VALID_PEPTIDES))
 @click.option("-o", "--outdir", type=click.Path(exists=True, dir_okay=True, writable=True), default="./data")
-@click.option("-d", "--distances", type=float, multiple=True, default=DEFAULT_DISTANCES.tolist())
-@click.option("--test/--no-test", default=False)
 def sanity_check_cmd(
         aminoacids1: str,
         aminoacids2: str,
